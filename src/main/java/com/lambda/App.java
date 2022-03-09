@@ -182,7 +182,7 @@ public class App {
 
     public static Function<LocalDate, String> time() {
         // Return a lambda accepting a LocalDate parameter and returning a String which
-        // formats the date like so: "<Year>:<Month>:<Day>".
+        // formats the date like so: "<Year>-<Month>-<Day>".
         return null;
     }
 
