@@ -11,6 +11,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class App {
     public static void main(String[] args) {
@@ -149,6 +150,34 @@ public class App {
                                                               // return it. But this means we can access variables
                                                               // outside of the lambda...
         F.print(test2, s2);
+
+        /*
+         * Thus we can conclude that lambdas can only be used on interfaces with 1
+         * abstract method. Luckily the Java Library provides some special interfaces
+         * that we can quickly use. Here are some of the most common ones.
+         */
+
+        Function<Integer, Double> function = x -> x.doubleValue(); // A function takes one parameter and outputs a
+                                                                   // result. Used in streams by map.
+        function.apply(10); // This calls the lambda.
+
+        Predicate<Integer> pred = x -> true; // A predicate takes one parameter and outputs a boolean as a result. Used
+                                             // in streams by filter.
+        pred.test(10); // This calls the lambda.
+
+        Comparator<Integer> comparator = (x, y) -> x - y; // A comparator takes in 2 parameters and outputs its relation
+                                                          // to one another. So which one is larger or if they are
+                                                          // equal. Used in streams by sorted, max, min (everything that
+                                                          // need to compare objects).
+        comparator.compare(10, 20); // This calls the lambda.
+
+        Consumer<Integer> con = x -> System.out.println(x); // A consumer takes in 1 parameter and returns nothing. The
+                                                            // use is rather limited but it's for example nice if you
+                                                            // just want to print all the elements individually. Used in
+                                                            // streams by forEach.
+        con.accept(10); // This calls the lambda.
+
+        stream();
     }
 
     // ------------------------------
@@ -213,6 +242,67 @@ public class App {
         // Implement a sorting algorithm sorting "list" from HIGHEST to the LOWEST.
         // Refrain from using list.sort(...). Tipp: search bubble sort (:
         return null;
+    }
+
+    static void stream() {
+        /**
+         * Streams are also like lambdas mostly used for syntatic sugar. They were a
+         * concept only in functional programming but they spread to other programming
+         * languages. With streams you can chain individual instructions together which
+         * will then operation in sequence on each element of an collection. The result
+         * is then processed by a terminating instruction like collect (collects all
+         * processes elements to a collection) or max/min (returns only the
+         * highest/lowest values of all the processed elements) or more.
+         * 
+         * Here is a list of some important instructions for streams.
+         */
+
+        final List<Integer> list = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9);
+
+        list.stream().collect(Collectors.toList()); // This is a terminating instruction. So this ends the stream by
+                                                    // collecting all the processed elements into a list.
+                                                    // Collectors.toList(): List, Collections.toSet(): Set.
+
+        list.stream().count(); // This counts all the remaining process elements. It's also a terminating
+                               // instruction.
+
+        list.stream().forEach(x -> System.out.println(x)); // This process all the elements with a for each loop. As
+                                                           // above this terminates.
+
+        list.stream().max((x, y) -> x - y); // This returns the largest element of the processed stream. Warning the
+                                            // output is an optional, so this fails. Specifically it fails when no
+                                            // process element is left in the stream.
+
+        /**
+         * Notice if we call stream then it outputs a general Stream object. There also
+         * exists more spezialized stream classes like IntegerStream or DoubleStream.
+         * These mainly exist to ease up usage of methods like max, min or sorted which
+         * all requires a comparator as a input object in the normals streams. But with
+         * the specialized streams max, min and sorted all don't require a comparator
+         * parameter since for Integers you obviously probably want to use
+         * Integer::compare.
+         */
+
+        list.stream().map(x -> x); // This turns each element to another element (could also be from another type).
+
+        list.stream().distinct(); // This removes all the duplicates of a stream.
+
+        list.stream().filter(x -> true); // Based on a predicate this removes all the elements not matching the
+                                         // predicate.
+
+        list.stream().mapToInt(x -> x); // This turns each element to some integer based on the function interface. This
+                                        // also give the specialized stream of its respective type.
+
+        list.stream().mapToInt(x -> x).max(); // Notice the comparators aren't needed anymore.
+        list.stream().mapToInt(x -> x).min();
+        list.stream().mapToInt(x -> x).sorted();
+
+        /**
+         * Streams can be imagined as water streams. Each instruction represents
+         * something that removes water or changes something in the water. The
+         * terminating instructions collect the water stream. Like collect(...) collects
+         * all, min() collects only one droplet and max() as well.
+         */
     }
 
     // Streams usage --------------------------------
